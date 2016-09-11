@@ -508,7 +508,7 @@ const render = function(config) {
             hash = encodeURIComponent(hxList[left].textContent);
         }
         clearTimeout(this.hashing);
-        this.hashing = setTimeout(() => this.hashing = null);
+        this.hashing = setTimeout(() => this.hashing = null, 100);
         location.hash = hash;
       }
     }
@@ -640,7 +640,7 @@ const render = function(config) {
       new FrameHeader().renderTo(this);
       Promise.all([ this.menu, this.content, this.hxList ]).then(([ menu, content, hxList ]) => {
         this.frameBody = new FrameBody({ menu, content, hxList }).renderTo(this);
-      });
+      }, error => console.error(error));
     }
     get md() {
       let value = fetch('README.md').then(response => {
@@ -658,7 +658,8 @@ const render = function(config) {
     get content() {
       let value = Frame.$hljs.then(() => this.md).then(md => {
         let content = new FrameContent({ template: `<div>${marked(md)}</div>` });
-        for (let a of content.element.querySelectorAll('a')) a.target = '_blank';
+        let aList = content.element.querySelectorAll('a');
+        for (let a of [].slice.call(aList)) a.target = '_blank';
         return content;
       }, error => console.error(error)); // eslint-disable-line
       Object.defineProperty(this, 'content', { configurable: true, value });
@@ -667,6 +668,7 @@ const render = function(config) {
     get hxList() {
       let value = this.content.then(content => {
         let list = content.element.querySelectorAll('h1,h2,h3,h4,h5,h6');
+        list = [].slice.call(list);
         for (let i of list) i.removeAttribute('id');
         return list;
       });

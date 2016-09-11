@@ -1,13 +1,14 @@
 {
   "name": "reciper",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A DOCUMENTATION SITE CREATOR",
   "main": "index.js",
   "directories": {
     "test": "tests"
   },
   "scripts": {
-    "test": "exit 0"
+    "test": "exit 0",
+    "build": "babel index.js -o index.es5.js"
   },
   "author": "admin@web-tinker.com",
   "license": "MIT",
@@ -20,5 +21,9 @@
     "items": [
       { "text": "Intro", "href": "/intro/" }
     ]
+  },
+  "devDependencies": {
+    "babel-cli": "^6.10.1",
+    "babel-preset-es2015": "^6.9.0"
   }
 }
