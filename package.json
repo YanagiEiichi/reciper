@@ -1,0 +1,24 @@
+{
+  "name": "reciper",
+  "version": "0.1.0",
+  "description": "A DOCUMENTATION SITE CREATOR",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "exit 0"
+  },
+  "author": "admin@web-tinker.com",
+  "license": "MIT",
+  "reciperConfig": {
+    "darkColor": "#333",
+    "normalColor": "#666",
+    "primaryColor": "#000",
+    "logoUrl": "",
+    "languages": [ "xml", "markdown", "bash" ],
+    "items": [
+      { "text": "Intro", "href": "/intro/" }
+    ]
+  }
+}
