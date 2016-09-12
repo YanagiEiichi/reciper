@@ -155,7 +155,7 @@ const render = function(config) {
   class Nav extends Jinkela {
     static get navMap() {
       let value = {};
-      for (let i of config.items) value[i.href] = i;
+      config.items.forEach(item => value[item.href] = item);
       Object.defineProperty(this, 'navMap', { configurable: true, value });
       return value;
     }
@@ -465,7 +465,7 @@ const render = function(config) {
       if (this.hashing) return;
       let { hxList } = this;
       let text = decodeURIComponent(location.hash.slice(1));
-      for (let i of hxList) {
+      hxList.forEach(i => {
         if (i.textContent === text) {
           this.animating = true;
           let callback = () => this.animating = false;
@@ -473,7 +473,7 @@ const render = function(config) {
           let options = { speed: 200, callback, offset };
           return smoothScroll.animateScroll(i, null, options);
         }
-      }
+      });
     }
     scroll() {
       this.frameMenu.update();
@@ -640,7 +640,7 @@ const render = function(config) {
       new FrameHeader().renderTo(this);
       Promise.all([ this.menu, this.content, this.hxList ]).then(([ menu, content, hxList ]) => {
         this.frameBody = new FrameBody({ menu, content, hxList }).renderTo(this);
-      }, error => console.error(error));
+      }, error => alert(error.message));
     }
     get md() {
       let value = fetch('README.md').then(response => {
@@ -659,7 +659,16 @@ const render = function(config) {
       let value = Frame.$hljs.then(() => this.md).then(md => {
         let content = new FrameContent({ template: `<div>${marked(md)}</div>` });
         let aList = content.element.querySelectorAll('a');
-        for (let a of [].slice.call(aList)) a.target = '_blank';
+        [].forEach.call(aList, a => a.target = '_blank');
+        let imgList = content.element.querySelectorAll('img');
+        let width = Math.min(this.element.offsetWidth - 28, 600);
+        [].forEach.call(imgList, img => {
+          if (img.width > width) {
+            let scale = width / img.width;
+            img.width *= scale;
+            img.height *= scale;
+          }
+        });
         return content;
       }, error => console.error(error)); // eslint-disable-line
       Object.defineProperty(this, 'content', { configurable: true, value });
@@ -669,7 +678,7 @@ const render = function(config) {
       let value = this.content.then(content => {
         let list = content.element.querySelectorAll('h1,h2,h3,h4,h5,h6');
         list = [].slice.call(list);
-        for (let i of list) i.removeAttribute('id');
+        list.forEach(i => i.removeAttribute('id'));
         return list;
       });
       Object.defineProperty(this, 'hxList', { configurable: true, value });
