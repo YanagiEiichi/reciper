@@ -509,7 +509,7 @@ const render = function(config) {
         }
         clearTimeout(this.hashing);
         this.hashing = setTimeout(() => this.hashing = null, 100);
-        location.hash = hash;
+        location.replace('#' + hash);
       }
     }
     init() {
@@ -659,7 +659,9 @@ const render = function(config) {
       let value = Frame.$hljs.then(() => this.md).then(md => {
         let content = new FrameContent({ template: `<div>${marked(md)}</div>` });
         let aList = content.element.querySelectorAll('a');
-        [].forEach.call(aList, a => a.target = '_blank');
+        [].forEach.call(aList, a => {
+          if (!/^#/.test(a.getAttribute('href'))) a.target = '_blank';
+        });
         let imgList = content.element.querySelectorAll('img');
         let width = Math.min(this.element.offsetWidth - 28, 600);
         [].forEach.call(imgList, img => {
