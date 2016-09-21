@@ -171,7 +171,7 @@ const render = function(config) {
 
 
   class FrameHeaderName extends Jinkela {
-    get template() { return `<a href="/">${config.name}</a>`; }
+    get template() { return `<a href="${config.home}">${config.name}</a>`; }
     get styleSheet() {
       return `
         :scope {
@@ -258,7 +258,7 @@ const render = function(config) {
     init() {
       new FrameHeaderHamburger().renderTo(this);
       let logo = new Logo({ size: 40 }).renderTo(this);
-      logo.element.addEventListener('click', () => location.href = '/');
+      logo.element.addEventListener('click', () => location.href = config.home);
       new FrameHeaderName().renderTo(this);
       new FrameHeaderNav().renderTo(this);
     }
@@ -752,11 +752,12 @@ const render = function(config) {
 
   config.name = config.name || 'anonymous';
   config.description = config.description || config.name;
-  config.darkColor = config.darkColor || "#333";
-  config.normalColor = config.normalColor || "#666";
-  config.primaryColor = config.primaryColor || "#000";
+  config.darkColor = config.darkColor || '#333';
+  config.normalColor = config.normalColor || '#666';
+  config.primaryColor = config.primaryColor || '#000';
+  config.home = config.home || '/';
 
-  let Component = location.pathname === '/' ? Landing : Frame;
+  let Component = location.pathname === config.home ? Landing : Frame;
   new Component().renderTo(document.body);
   document.title = config.name;
 

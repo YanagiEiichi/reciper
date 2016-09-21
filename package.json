@@ -17,6 +17,7 @@
     "normalColor": "#666",
     "primaryColor": "#000",
     "logoUrl": "",
+    "home": "/reciper/",
     "languages": [ "xml", "markdown", "bash" ],
     "items": [
       { "text": "Intro", "href": "/reciper/intro/" }
