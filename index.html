@@ -8,9 +8,9 @@
     <script>
       if (!window.fetch) document.write('<script src="//github.elemecdn.com/uglifyjs!github/fetch/v0.11.0/fetch.js"><\/script>');
     </script>
-    <script src="/index.js"></script>
+    <script src="/reciper/index.js"></script>
     <script>
-      fetch('/package.json').then(function(response) { return response.json(); }).then(function(pkg) {
+      fetch('/reciper/package.json').then(function(response) { return response.json(); }).then(function(pkg) {
         var config = pkg.reciperConfig;
         config.name = pkg.name;
         config.description = pkg.description;

@@ -19,7 +19,7 @@
     "logoUrl": "",
     "languages": [ "xml", "markdown", "bash" ],
     "items": [
-      { "text": "Intro", "href": "/intro/" }
+      { "text": "Intro", "href": "/reciper/intro/" }
     ]
   },
   "devDependencies": {
