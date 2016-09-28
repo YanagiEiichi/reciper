@@ -3,6 +3,7 @@
 const render = function(config) {
 
   class LandingHeader extends Jinkela {
+    get tagName() { return 'header'; }
     init() {
       new Nav().renderTo(this);
     }
@@ -153,6 +154,7 @@ const render = function(config) {
   }
 
   class Nav extends Jinkela {
+    get tagName() { return 'nav'; }
     static get navMap() {
       let value = {};
       config.items.forEach(item => value[item.href] = item);
@@ -255,6 +257,7 @@ const render = function(config) {
   }
 
   class FrameHeader extends Jinkela {
+    get tagName() { return 'header'; }
     init() {
       new FrameHeaderHamburger().renderTo(this);
       let logo = new Logo({ size: 40 }).renderTo(this);
