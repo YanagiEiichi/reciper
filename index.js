@@ -455,6 +455,25 @@ const render = function(config) {
     }
   }
 
+  class FrameError extends Jinkela {
+    get template() {
+      return `<div><h1>{message}</h1></div>`;
+    }
+    get styleSheet() {
+      return `
+        :scope {
+          position: relative;
+          padding: 0 60px;
+        }
+        @media (max-width: 720px) {
+          :scope {
+            padding: 60px 1em;
+          }
+        }
+      `;
+    }
+  }
+
   class FrameBody extends Jinkela {
     toggleMenu() { this.frameMenu.toggle(); }
     get fixedOffset() {
@@ -640,16 +659,19 @@ const render = function(config) {
       new FrameHeader().renderTo(this);
       Promise.all([ this.menu, this.content, this.hxList ]).then(([ menu, content, hxList ]) => {
         this.frameBody = new FrameBody({ menu, content, hxList }).renderTo(this);
-      }, error => alert(error.message));
+      }, error => {
+        let { name, message } = error;
+        this.frameBody = new FrameError({ name, message }).renderTo(this);
+      });
     }
     get md() {
       let value = fetch('README.md').then(response => {
         if (response.status < 300) {
           return response.text();
         } else {
-          return response.text().then(text => {
-            throw text;
-          });
+          let error = new Error(response.statusText);
+          error.name = 'HTTP_' + response.status;
+          throw error;
         }
       });
       Object.defineProperty(this, 'md', { configurable: true, value });
@@ -672,7 +694,9 @@ const render = function(config) {
           }
         });
         return content;
-      }, error => console.error(error)); // eslint-disable-line
+      }, error => {
+        throw error;
+      });
       Object.defineProperty(this, 'content', { configurable: true, value });
       return value;
     }
@@ -682,6 +706,8 @@ const render = function(config) {
         list = [].slice.call(list);
         list.forEach(i => i.removeAttribute('id'));
         return list;
+      }, error => {
+        throw error;
       });
       Object.defineProperty(this, 'hxList', { configurable: true, value });
       return value;
