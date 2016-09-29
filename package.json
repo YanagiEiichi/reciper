@@ -1,6 +1,6 @@
 {
   "name": "reciper",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "A DOCUMENTATION SITE CREATOR",
   "main": "index.js",
   "directories": {
@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "exit 0",
-    "build": "babel index.js -o index.es5.js"
+    "prepublish": "babel index.js -o index.es5.js"
   },
   "author": "admin@web-tinker.com",
   "license": "MIT",
