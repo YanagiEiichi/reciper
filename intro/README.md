@@ -14,7 +14,8 @@ cd demo
 #### 2. Create a index.html to site root
 
 ```html
-<script src="reciper.js"></script>
+<!DOCTYPE html>
+<script src="//yanagieiichi.github.io/reciper/index.js"></script>
 <script>
 reciper({
   items: [

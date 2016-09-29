@@ -20,7 +20,8 @@
     "home": "/reciper/",
     "languages": [ "xml", "markdown", "bash" ],
     "items": [
-      { "text": "Intro", "href": "/reciper/intro/" }
+      { "text": "Introduction", "href": "/reciper/intro/" },
+      { "text": "Github", "href": "https://github.com/YanagiEiichi/reciper/", "target": "_blank" }
     ]
   },
   "devDependencies": {
