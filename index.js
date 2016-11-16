@@ -261,6 +261,8 @@ const render = function(config) {
     init() {
       new FrameHeaderHamburger().renderTo(this);
       let logo = new Logo({ size: 40 }).renderTo(this);
+      logo.element.style.cursor = 'pointer';
+      logo.element.firstElementChild.style.cursor = 'pointer';
       logo.element.addEventListener('click', () => location.href = config.home);
       new FrameHeaderName().renderTo(this);
       new FrameHeaderNav().renderTo(this);
