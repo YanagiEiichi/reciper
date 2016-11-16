@@ -5,7 +5,7 @@ const render = function(config) {
   class LandingHeader extends Jinkela {
     get tagName() { return 'header'; }
     init() {
-      new Nav().renderTo(this);
+      new Nav().to(this);
     }
     get styleSheet() {
       return `
@@ -51,11 +51,11 @@ const render = function(config) {
 
   class Landing extends Jinkela {
     init () {
-      new LandingHeader().renderTo(this);
-      let logo = new Logo({ size: 240 }).renderTo(this);
+      new LandingHeader().to(this);
+      let logo = new Logo({ size: 240 }).to(this);
       logo.element.style.marginTop = '50px';
-      new LandingCaption().renderTo(this);
-      new LandingDescription().renderTo(this);
+      new LandingCaption().to(this);
+      new LandingDescription().to(this);
     }
     get styleSheet() {
       return `
@@ -80,11 +80,11 @@ const render = function(config) {
     init() {
       let size = this.size + 'px';
       if (config.logoUrl) {
-        new Jinkela({ template: `<img src="${config.logoUrl}" />` }).renderTo(this);
+        new Jinkela({ template: `<img src="${config.logoUrl}" />` }).to(this);
       } else {
         let text = config.name[0].toUpperCase();
         if (text.charCodeAt(0) < 256) text += config.name[1];
-        new Jinkela({ template: `<span>${text}</span>` }).renderTo(this);
+        new Jinkela({ template: `<span>${text}</span>` }).to(this);
         this.element.style.lineHeight = size;
         this.element.style.fontSize = this.size / 2 + 'px';
       }
@@ -167,7 +167,7 @@ const render = function(config) {
       return value;
     }
     init() {
-      config.items.forEach(option => new NavItem(option).renderTo(this));
+      config.items.forEach(option => new NavItem(option).to(this));
     }
   }
 
@@ -259,13 +259,13 @@ const render = function(config) {
   class FrameHeader extends Jinkela {
     get tagName() { return 'header'; }
     init() {
-      new FrameHeaderHamburger().renderTo(this);
-      let logo = new Logo({ size: 40 }).renderTo(this);
+      new FrameHeaderHamburger().to(this);
+      let logo = new Logo({ size: 40 }).to(this);
       logo.element.style.cursor = 'pointer';
       logo.element.firstElementChild.style.cursor = 'pointer';
       logo.element.addEventListener('click', () => location.href = config.home);
-      new FrameHeaderName().renderTo(this);
-      new FrameHeaderNav().renderTo(this);
+      new FrameHeaderName().to(this);
+      new FrameHeaderNav().to(this);
     }
     get styleSheet() {
       return `
@@ -321,7 +321,7 @@ const render = function(config) {
 
   class FrameMenuItem extends Jinkela {
     init() {
-      if (this.children) new FrameMenuList({ list: this.children }).renderTo(this);
+      if (this.children) new FrameMenuList({ list: this.children }).to(this);
       this.href = '#' + encodeURIComponent(this.text);
     }
     get template() {
@@ -345,7 +345,7 @@ const render = function(config) {
 
   class FrameMenuList extends Jinkela {
     init() {
-      this.list.forEach(item => new FrameMenuItem(item).renderTo(this));
+      this.list.forEach(item => new FrameMenuItem(item).to(this));
     }
     update() {
       let { element } = this;
@@ -392,10 +392,10 @@ const render = function(config) {
 
   class FrameMenu extends Jinkela {
     initCaption() {
-      let frameMenuNav = new FrameMenuNav().renderTo(this);
+      let frameMenuNav = new FrameMenuNav().to(this);
       if (this.caption) this.caption.element.parentNode.removeChild(this.caption.element);
       let text = Nav.current && Nav.current.text || '未知';
-      if (text) this.caption = new FrameMenuCaption({ text }).renderTo(this);
+      if (text) this.caption = new FrameMenuCaption({ text }).to(this);
     }
     updateMenu() { this.menuList.update(); }
     update() {
@@ -414,7 +414,7 @@ const render = function(config) {
         this.element.classList.remove('active');
       });
       this.initCaption();
-      this.menuList = new FrameMenuList({ list: this.menu }).renderTo(this);
+      this.menuList = new FrameMenuList({ list: this.menu }).to(this);
     }
     toggle() { this.element.classList.toggle('active'); }
     get styleSheet() {
@@ -456,7 +456,7 @@ const render = function(config) {
   class FrameMain extends Jinkela {
     init() {
       let { content } = this;
-      content.renderTo(this);
+      content.to(this);
     }
   }
 
@@ -538,8 +538,8 @@ const render = function(config) {
     }
     init() {
       let { menu, content } = this;
-      this.frameMenu = new FrameMenu({ menu }).renderTo(this);
-      this.frameMain = new FrameMain({ content }).renderTo(this);
+      this.frameMenu = new FrameMenu({ menu }).to(this);
+      this.frameMain = new FrameMain({ content }).to(this);
       this.animating = false;
       this.hashing = null;
       addEventListener('scroll', () => this.scroll());
@@ -661,12 +661,12 @@ const render = function(config) {
     }
     init() {
       this.element.addEventListener('click', event => this.click(event));
-      new FrameHeader().renderTo(this);
+      new FrameHeader().to(this);
       Promise.all([ this.menu, this.content, this.hxList ]).then(([ menu, content, hxList ]) => {
-        this.frameBody = new FrameBody({ menu, content, hxList }).renderTo(this);
+        this.frameBody = new FrameBody({ menu, content, hxList }).to(this);
       }, error => {
         let { name, message } = error;
-        this.frameBody = new FrameError({ name, message }).renderTo(this);
+        this.frameBody = new FrameError({ name, message }).to(this);
       });
     }
     get md() {
@@ -789,7 +789,7 @@ const render = function(config) {
   config.home = config.home || '/';
 
   let Component = location.pathname === config.home ? Landing : Frame;
-  new Component().renderTo(document.body);
+  new Component().to(document.body);
   document.title = config.name;
 
 };
@@ -822,8 +822,8 @@ const load = (resources) => {
 };
 
 let $loading = load([
-  load('//github.elemecdn.com/uglifyjs!YanagiEiichi/jinkela/1.2.3/jinkela.js')
-    .then(() => load('//github.elemecdn.com/uglifyjs!YanagiEiichi/jinkela/1.2.3/plugins/nesting.js')),
+  load('//github.elemecdn.com/uglifyjs!YanagiEiichi/jinkela/1.2.14/jinkela.js')
+    .then(() => load('//github.elemecdn.com/uglifyjs!YanagiEiichi/jinkela/1.2.14/plugins/nesting.js')),
   '//github.elemecdn.com/chjj/marked/v0.3.6/marked.min.js',
   '//github.elemecdn.com/uglifyjs!isagalaev/highlight.js/9.6.0/src/highlight.js',
   '//github.elemecdn.com/cferdinandi/smooth-scroll/v10.0.1/dist/js/smooth-scroll.min.js',
