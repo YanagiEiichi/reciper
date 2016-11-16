@@ -1,6 +1,6 @@
 {
   "name": "reciper",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "A DOCUMENTATION SITE CREATOR",
   "main": "index.js",
   "directories": {
@@ -17,6 +17,7 @@
     "normalColor": "#666",
     "primaryColor": "#000",
     "logoUrl": "",
+    "logoHref": "/reciper/intro/",
     "home": "/reciper/",
     "languages": [ "xml", "markdown", "bash" ],
     "items": [

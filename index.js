@@ -52,7 +52,7 @@ const render = function(config) {
   class Landing extends Jinkela {
     init () {
       new LandingHeader().to(this);
-      let logo = new Logo({ size: 240 }).to(this);
+      let logo = new Logo({ size: 240, href: config.logoHref }).to(this);
       logo.element.style.marginTop = '50px';
       new LandingCaption().to(this);
       new LandingDescription().to(this);
@@ -90,6 +90,7 @@ const render = function(config) {
       }
       this.element.style.width = size;
       this.element.style.height = size;
+      this.element.addEventListener('click', event => location.href = this.href || config.home);
     }
     get template() {
       return `<div class="logo"></div>`;
@@ -98,13 +99,13 @@ const render = function(config) {
       return `
         :scope {
           margin: auto;
+          cursor: pointer;
           > * {
             display: block;
             width: 100%;
             height: 100%;
           }
           > span {
-            cursor: default;
             text-align: center;
             background: #f5f5f5;
             border-radius: 100%;
@@ -261,9 +262,6 @@ const render = function(config) {
     init() {
       new FrameHeaderHamburger().to(this);
       let logo = new Logo({ size: 40 }).to(this);
-      logo.element.style.cursor = 'pointer';
-      logo.element.firstElementChild.style.cursor = 'pointer';
-      logo.element.addEventListener('click', () => location.href = config.home);
       new FrameHeaderName().to(this);
       new FrameHeaderNav().to(this);
     }
