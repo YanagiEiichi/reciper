@@ -123,9 +123,12 @@ const render = function(config) {
         a.classList.add('active');
       }
       if (this.target) a.setAttribute('target', this.target);
+      a.addEventListener('touchstart', () => {
+        this.link.click();
+      });
     }
     get template() {
-      return '<span><a href="{href}">{text}</a></span>';
+      return '<span><a ref="link" href="{href}">{text}</a></span>';
     }
     get styleSheet() {
       return `
@@ -481,7 +484,7 @@ const render = function(config) {
     toggleMenu() { this.frameMenu.toggle(); }
     get fixedOffset() {
       return matchMedia('(max-width: 720px)').matches ? 60 : 0;
-    } 
+    }
     hashchange() {
       this.frameMenu.updateMenu();
       if (this.hashing) return;
@@ -820,8 +823,9 @@ const load = (resources) => {
 };
 
 let $loading = load([
-  load('//github.elemecdn.com/uglifyjs!YanagiEiichi/jinkela/1.2.14/jinkela.js')
-    .then(() => load('//github.elemecdn.com/uglifyjs!YanagiEiichi/jinkela/1.2.14/plugins/nesting.js')),
+  load('//github.elemecdn.com/uglifyjs!YanagiEiichi/jinkela/1.2.15/jinkela.js')
+    .then(() => load('//github.elemecdn.com/uglifyjs!YanagiEiichi/jinkela/1.2.15/plugins/nesting.js'))
+    .then(() => load('//github.elemecdn.com/uglifyjs!YanagiEiichi/jinkela/1.2.15/directives/ref.js')),
   '//github.elemecdn.com/chjj/marked/v0.3.6/marked.min.js',
   '//github.elemecdn.com/uglifyjs!isagalaev/highlight.js/9.6.0/src/highlight.js',
   '//github.elemecdn.com/cferdinandi/smooth-scroll/v10.0.1/dist/js/smooth-scroll.min.js',
