@@ -1,6 +1,6 @@
 {
   "name": "reciper",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "A DOCUMENTATION SITE CREATOR",
   "main": "index.js",
   "directories": {
@@ -9,6 +9,9 @@
   "scripts": {
     "test": "exit 0",
     "prepublish": "babel index.js -o index.es5.js"
+  },
+  "bin": {
+    "reciper": "./reciper.js"
   },
   "author": "admin@web-tinker.com",
   "license": "MIT",
@@ -19,14 +22,29 @@
     "logoUrl": "",
     "logoHref": "/reciper/intro/",
     "home": "/reciper/",
-    "languages": [ "xml", "markdown", "bash" ],
+    "languages": [
+      "xml",
+      "markdown",
+      "bash"
+    ],
     "items": [
-      { "text": "Introduction", "href": "/reciper/intro/" },
-      { "text": "Github", "href": "https://github.com/YanagiEiichi/reciper/", "target": "_blank" }
+      {
+        "text": "Introduction",
+        "href": "/reciper/intro/"
+      },
+      {
+        "text": "Github",
+        "href": "https://github.com/YanagiEiichi/reciper/",
+        "target": "_blank"
+      }
     ]
   },
   "devDependencies": {
     "babel-cli": "^6.10.1",
     "babel-preset-es2015": "^6.9.0"
+  },
+  "dependencies": {
+    "argollector": "^1.0.0",
+    "mkdirp": "^0.5.1"
   }
 }
