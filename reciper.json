@@ -1,0 +1,26 @@
+{
+  "name": "reciper",
+  "description": "A DOCUMENTATION SITE CREATOR",
+  "darkColor": "#333",
+  "normalColor": "#666",
+  "primaryColor": "#000",
+  "logoUrl": "",
+  "logoHref": "/reciper/intro/",
+  "home": "/reciper/",
+  "languages": [
+    "xml",
+    "markdown",
+    "bash"
+  ],
+  "items": [
+    {
+      "text": "Introduction",
+      "href": "intro"
+    },
+    {
+      "text": "Github",
+      "href": "https://github.com/YanagiEiichi/reciper/",
+      "target": "_blank"
+    }
+  ]
+}
