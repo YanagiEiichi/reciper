@@ -1,11 +1,11 @@
 {
   "name": "reciper",
-  "description": "A DOCUMENTATION SITE CREATOR",
+  "description": "仕様書を作る工具",
   "darkColor": "#333",
   "normalColor": "#666",
   "primaryColor": "#000",
   "logoUrl": "",
-  "logoHref": "english/intro/",
+  "logoHref": "intro/",
   "languages": [
     "xml",
     "markdown",
@@ -13,8 +13,8 @@
   ],
   "items": [
     {
-      "text": "Introduction",
-      "href": "english/intro/"
+      "text": "紹介",
+      "href": "intro/"
     },
     {
       "text": "Github",
@@ -22,19 +22,19 @@
       "target": "_blank"
     },
     {
-      "text": "Language",
+      "text": "言語",
       "children": [
         {
           "text": "English",
-          "href": "english/"
-        },
-        {
-          "text": "中文",
-          "href": "zhongwen/"
+          "href": "../english/"
         },
         {
           "text": "日本語",
-          "href": "nihongo/"
+          "href": "../nihongo/"
+        },
+        {
+          "text": "中文",
+          "href": "../zhongwen/"
         }
       ]
     }

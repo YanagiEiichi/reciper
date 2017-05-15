@@ -5,7 +5,7 @@
   "normalColor": "#666",
   "primaryColor": "#000",
   "logoUrl": "",
-  "logoHref": "english/intro/",
+  "logoHref": "intro/",
   "languages": [
     "xml",
     "markdown",
@@ -14,7 +14,7 @@
   "items": [
     {
       "text": "Introduction",
-      "href": "english/intro/"
+      "href": "intro/"
     },
     {
       "text": "Github",
@@ -26,15 +26,15 @@
       "children": [
         {
           "text": "English",
-          "href": "english/"
-        },
-        {
-          "text": "中文",
-          "href": "zhongwen/"
+          "href": "../english/"
         },
         {
           "text": "日本語",
-          "href": "nihongo/"
+          "href": "../nihongo/"
+        },
+        {
+          "text": "中文",
+          "href": "../zhongwen/"
         }
       ]
     }

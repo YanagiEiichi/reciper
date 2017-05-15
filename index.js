@@ -115,14 +115,75 @@ const render = function(config) {
     }
   }
 
+  class NavItemDroppingPanel extends Jinkela {
+    get styleSheet() {
+      return `
+        :scope {
+          position: absolute;
+          top: 100%;
+          left: 0px;
+          display: none;
+        }
+        @media (max-width: 720px) {
+          .FrameMenuNav :scope {
+            position: static;
+            display: block;
+            > * {
+              line-height: 32px;
+              display: block;
+              margin-left: 1em;
+            }
+          }
+        }
+      `;
+    }
+    show() { this.element.style.display = 'block'; }
+    hide() { this.element.style.display = 'none'; }
+    init() {
+      NavItem.from(this.list).to(this);
+    }
+  }
+
+  class NavItemDroppingTip extends Jinkela {
+    get styleSheet() {
+      return `
+        :scope {
+          border-style: solid;
+          border-width: 8px 5px 0px 5px;
+          border-right-color: transparent;
+          border-bottom-color: transparent;
+          border-left-color: transparent;
+          margin-left: .5em;
+          display: inline-block;
+          line-height: 14px;
+        }
+      `;
+    }
+  }
 
   class NavItem extends Jinkela {
     init() {
       let a = this.element.firstElementChild;
-      if (this.href === location.pathname) {
-        a.classList.add('active');
+      if (this.href) {
+        if (this.href === location.pathname) {
+          a.classList.add('active');
+        }
+        if (this.target) a.setAttribute('target', this.target);
+      } else {
+        this.href = 'javascript:';
       }
-      if (this.target) a.setAttribute('target', this.target);
+      if (this.children) {
+        let panel = new NavItemDroppingPanel({ list: this.children }).to(this);
+        new NavItemDroppingTip().to(a);
+        this.element.addEventListener('mouseenter', () => {
+          if (this.element.matches('.FrameMenuNav *')) return;
+          panel.show();
+        });
+        this.element.addEventListener('mouseleave', () => {
+          if (this.element.matches('.FrameMenuNav *')) return;
+          panel.hide();
+        });
+      }
     }
     get template() {
       return '<span><a href="{href}">{text}</a></span>';
@@ -130,6 +191,7 @@ const render = function(config) {
     get styleSheet() {
       return `
         :scope {
+          position: relative;
           display: inline-block;
           a {
             white-space: nowrap;
@@ -168,7 +230,7 @@ const render = function(config) {
       return value;
     }
     init() {
-      config.items.forEach(option => new NavItem(option).to(this));
+      NavItem.from(config.items).to(this);
     }
   }
 
@@ -295,6 +357,7 @@ const render = function(config) {
   }
 
   class FrameMenuNav extends Nav {
+    init() { this.element.classList.add('FrameMenuNav'); }
     get styleSheet() {
       return `
         :scope {
@@ -820,8 +883,7 @@ const load = (resources) => {
 };
 
 let $loading = load([
-  load('//github.elemecdn.com/uglifyjs!YanagiEiichi/jinkela/1.2.14/jinkela.js')
-    .then(() => load('//github.elemecdn.com/uglifyjs!YanagiEiichi/jinkela/1.2.14/plugins/nesting.js')),
+  load('//github.elemecdn.com/uglifyjs!YanagiEiichi/jinkela/1.2.19/umd.js'),
   '//github.elemecdn.com/chjj/marked/v0.3.6/marked.min.js',
   '//github.elemecdn.com/uglifyjs!isagalaev/highlight.js/9.6.0/src/highlight.js',
   '//github.elemecdn.com/cferdinandi/smooth-scroll/v10.0.1/dist/js/smooth-scroll.min.js',
