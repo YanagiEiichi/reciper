@@ -122,7 +122,19 @@ const render = function(config) {
           position: absolute;
           top: 100%;
           left: 0px;
-          display: none;
+          visibility: hidden;
+          background: #fff;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, .175);
+          border-radius: 4px;
+          text-align: center;
+          opacity: 0;
+          transform: translateY(-3px);
+          transition: opacity .2s ease, visibility .2s, transform .2s ease;
+          &.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+          }
         }
         @media (max-width: 720px) {
           .FrameMenuNav :scope {
@@ -137,8 +149,8 @@ const render = function(config) {
         }
       `;
     }
-    show() { this.element.style.display = 'block'; }
-    hide() { this.element.style.display = 'none'; }
+    show() { this.element.classList.add('active'); }
+    hide() { this.element.classList.remove('active'); }
     init() {
       NavItem.from(this.list).to(this);
     }
@@ -544,7 +556,7 @@ const render = function(config) {
     toggleMenu() { this.frameMenu.toggle(); }
     get fixedOffset() {
       return matchMedia('(max-width: 720px)').matches ? 60 : 0;
-    } 
+    }
     hashchange() {
       this.frameMenu.updateMenu();
       if (this.hashing) return;
