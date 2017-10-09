@@ -472,7 +472,7 @@ const render = function(config) {
     }
     updateMenu() { this.menuList.update(); }
     update() {
-      if (document.body.scrollTop > 90) {
+      if (document.documentElement.scrollTop > 90) {
         this.element.classList.add('fixed');
       } else {
         this.element.classList.remove('fixed');
@@ -575,7 +575,7 @@ const render = function(config) {
     scroll() {
       this.frameMenu.update();
       if (!this.animating) {
-        let { scrollTop } = document.body;
+        let { scrollTop } = document.documentElement;
         let { offsetTop } = this.element;
         let { hxList } = this;
         let [ left, right ] = [ 0, hxList.length - 1 ];
