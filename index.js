@@ -713,7 +713,7 @@ const render = function(config) {
         }
         @media (max-width: 1280px) {
           :scope {
-            margin-left: calc(240px + 1em);
+            margin-left: calc(260px + 1em);
             margin-right: 0;
           }
         }
