@@ -648,14 +648,14 @@ window.reciper = config => dependencies.then(([ _0, _1, Jinkela, marked, hljs, _
     hashchange() {
       this.frameMenu.updateMenu();
       if (this.hashing) return;
-      let { hxList } = this;
+      let { hxList } = this.content;
       let text = decodeURIComponent(location.hash.slice(1));
       hxList.forEach(i => {
         if (i.textContent === text) {
           this.animating = true;
-          let callback = () => this.animating = false;
+          let after = () => this.animating = false;
           let offset = this.fixedOffset;
-          let options = { speed: 200, callback, offset };
+          let options = { speed: 200, after, offset };
           return smoothScroll.animateScroll(i, null, options);
         }
       });
@@ -663,9 +663,9 @@ window.reciper = config => dependencies.then(([ _0, _1, Jinkela, marked, hljs, _
     scroll() {
       this.frameMenu.update();
       if (!this.animating) {
-        let { scrollTop } = document.documentElement;
+        let scrollTop = Math.max(document.documentElement.scrollTop, document.body.scrollTop);
         let { offsetTop } = this.element;
-        let { hxList } = this;
+        let { hxList } = this.content;
         let [ left, right ] = [ 0, hxList.length - 1 ];
         scrollTop += this.fixedOffset;
         const getOffset = index => {
@@ -723,16 +723,52 @@ window.reciper = config => dependencies.then(([ _0, _1, Jinkela, marked, hljs, _
   }
 
   class FrameContent extends Jinkela {
+    init() {
+      let aList = this.element.querySelectorAll('a');
+      // links
+      [].forEach.call(aList, a => {
+        if (!/^#/.test(a.getAttribute('href'))) a.target = '_blank';
+      });
+      // images
+      let imgList = this.element.querySelectorAll('img');
+      let width = Math.min(this.element.offsetWidth - 28, 600);
+      [].forEach.call(imgList, img => {
+        if (img.width > width) {
+          let scale = width / img.width;
+          img.width *= scale;
+          img.height *= scale;
+        }
+      });
+      // hxList
+      let list = this.element.querySelectorAll('h1,h2,h3,h4,h5,h6');
+      this.hxList = [];
+      for (let i = 0; i < list.length; i++) {
+        let item = list[i];
+        item.removeAttribute('id');
+        this.hxList.push(item);
+        // Wrap the h* and &~:not(h*) with a div.page
+        let page = document.createElement('div');
+        page.className = 'page';
+        item.parentNode.insertBefore(page, item);
+        page.appendChild(item);
+        while (page.nextSibling && !/^H\d$/.test(page.nextSibling.tagName)) page.appendChild(page.nextSibling);
+      }
+    }
     get styleSheet() {
+      let { clientHeight } = document.documentElement;
       return `
         :scope {
-          padding: 2.2em 0;
+          padding-top: 2.2em;
           margin: 0 auto;
           max-width: 600px;
           line-height: 1.6em;
           color: ${config.normalColor};
           > *:first-child {
             margin-top: 0;
+          }
+          > div.page:last-child {
+            min-height: ${clientHeight - 16}px;
+            padding-bottom: 16px; /* avoid margin-bottom collapsed with children */
           }
           img {
             max-width: 100%;
@@ -823,8 +859,8 @@ window.reciper = config => dependencies.then(([ _0, _1, Jinkela, marked, hljs, _
     init() {
       this.element.addEventListener('click', event => this.click(event));
       new FrameHeader().to(this);
-      Promise.all([ this.menu, this.content, this.hxList ]).then(([ menu, content, hxList ]) => {
-        this.frameBody = new FrameBody({ menu, content, hxList }).to(this);
+      Promise.all([ this.menu, this.content ]).then(([ menu, content ]) => {
+        this.frameBody = new FrameBody({ menu, content }).to(this);
       }, error => {
         let { name, stack } = error;
         this.frameBody = new FrameError({ name, message: stack }).to(this);
@@ -845,41 +881,16 @@ window.reciper = config => dependencies.then(([ _0, _1, Jinkela, marked, hljs, _
     }
     get content() {
       let value = Frame.$hljs.then(() => this.md).then(md => {
-        let content = new FrameContent({ template: `<div>${marked(md)}</div>` });
-        let aList = content.element.querySelectorAll('a');
-        [].forEach.call(aList, a => {
-          if (!/^#/.test(a.getAttribute('href'))) a.target = '_blank';
-        });
-        let imgList = content.element.querySelectorAll('img');
-        let width = Math.min(this.element.offsetWidth - 28, 600);
-        [].forEach.call(imgList, img => {
-          if (img.width > width) {
-            let scale = width / img.width;
-            img.width *= scale;
-            img.height *= scale;
-          }
-        });
-        return content;
+        return new FrameContent({ template: `<div>${marked(md)}</div>` });
       }, error => {
         throw error;
       });
       Object.defineProperty(this, 'content', { configurable: true, value });
       return value;
     }
-    get hxList() {
-      let value = this.content.then(content => {
-        let list = content.element.querySelectorAll('h1,h2,h3,h4,h5,h6');
-        list = [].slice.call(list);
-        list.forEach(i => i.removeAttribute('id'));
-        return list;
-      }, error => {
-        throw error;
-      });
-      Object.defineProperty(this, 'hxList', { configurable: true, value });
-      return value;
-    }
     get menu() {
-      return this.hxList.then(hxList => {
+      return this.content.then(content => {
+        let { hxList } = content;
         let index = 0;
         let result = function callee(level) {
           let result = [];
