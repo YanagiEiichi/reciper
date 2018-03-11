@@ -559,7 +559,8 @@ window.reciper = config => dependencies.then(([ _0, _1, Jinkela, marked, hljs, _
     }
     updateMenu() { this.menuList.update(); }
     update() {
-      if (document.documentElement.scrollTop > 90) {
+      let scrollTop = Math.max(document.documentElement.scrollTop, document.body.scrollTop);
+      if (scrollTop > 90) {
         this.element.classList.add('fixed');
       } else {
         this.element.classList.remove('fixed');
