@@ -4,28 +4,42 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="chrome=1" />
     <meta name="renderer" content="webkit" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0" />
-    <script src="//github.elemecdn.com/uglifyjs!YanagiEiichi/reciper/0.1.10/index.es5.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, minimum-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/reciper@0.1.12/index.min.js"></script>
     <script>
-      if (!window.Promise) document.write('<script src="//github.elemecdn.com/jakearchibald/es6-promise/v3.0.2/dist/es6-promise.min.js"><\/script>');
-      if (!window.fetch) document.write('<script src="//github.elemecdn.com/uglifyjs!github/fetch/v0.11.0/fetch.js"><\/script>');
+    LoadDependencies: void function() {
+      var list = [
+        // '/reciper@0.1.11/index.js',
+        !window.Promise && '/es6-promise@4.2.4/dist/es6-promise.min.js',
+        !window.fetch && '/whatwg-fetch@v2.0.3/fetch.min.js'
+      ];
+      for (var i = 0; i < list.length; i++) {
+        if (list[i]) document.write('<script src="//cdn.jsdelivr.net/npm' + list[i] + '"><\/script>' );
+      }
+    }();
     </script>
     <script>
-      void (function callee(href) {
-        var root = href.replace(/\/[^/]*$/, '');
-        if (root === href) return;
-        fetch(root + '/reciper.json').then(function(response) { return response.json(); }).then(function(config) {
-          config.home = root + '/';
-          if (config.logoHref && !/^(\w+:)?\/\/|^\//.test(config.logoHref)) config.logoHref = root + '/' + config.logoHref;
-          config.items.forEach(function callee(item) {
-            if (item.href && !/^(\w+:)?\/\/|^\//.test(item.href)) item.href = root + '/' + item.href;
-            if (item.children) item.children.forEach(callee);
+    DetectAndLoadReciper: void function callee(href, contents) {
+      var root = href.replace(/\/[^/]*$/, '');
+      if (root === href) return document.write(contents);
+      fetch(root + '/reciper.json').then(function(response) {
+        if (response.ok && /\bjson\b/.test(response.headers.get('Content-Type'))) {
+          response.json().then(config => {
+            config.home = root + '/';
+            if (config.logoHref && !/^(\w+:)?\/\/|^\//.test(config.logoHref)) {
+              config.logoHref = root + '/' + config.logoHref;
+            }
+            config.items.forEach(function callee(item) {
+              if (item.href && !/^(\w+:)?\/\/|^\//.test(item.href)) item.href = root + '/' + item.href;
+              if (item.children) item.children.forEach(callee);
+            });
+            reciper(config);
           });
-          reciper(config);
-        }, function() {
-          callee(root);
-        });
-      })(location.pathname);
+        } else {
+          response.text().then(callee.bind(null, root));
+        }
+      });
+    }(location.pathname);
     </script>
   </head>
 </html>

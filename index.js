@@ -1,6 +1,34 @@
 /**/ {
 
-const render = function(config) {
+const load = url => new Promise((resolve, reject) => {
+  if (/\.js$/.test(url)) {
+    fetch(url).then(response => Promise.all([ response, response.text() ])).then(([ response, body ]) => {
+      let type = response.headers.get('Content-Type');
+      if (!response.ok || !/\b(javascript)\b/.test(type)) throw body;
+      let module = { exports: {} };
+      new Function('module', 'exports', body)(module, module.exports);
+      return module.exports;
+    }).then(resolve, reject);
+  } else {
+    let link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = url;
+    link.addEventListener('load', resolve.bind(null, link));
+    link.addEventListener('error', reject);
+    document.head.appendChild(link);
+  }
+});
+
+const dependencies = Promise.all([
+  '//cdn.jsdelivr.net/npm/jinkela@1.3.2/umd.min.js',
+  '//cdn.jsdelivr.net/npm/marked@0.3.17/marked.min.js',
+  '//cdn.jsdelivr.net/npm/highlight.js@9.12.0/lib/highlight.min.js',
+  '//cdn.jsdelivr.net/npm/highlight.js@9.12.0/styles/default.min.css',
+  '//cdn.jsdelivr.net/npm/smooth-scroll@12.1.5/dist/js/smooth-scroll.min.js'
+].map(load));
+
+window.reciper = config => dependencies.then(([ Jinkela, marked, hljs, _, SmoothScroll ]) => {
+  const smoothScroll = new SmoothScroll();
 
   class LandingHeader extends Jinkela {
     get tagName() { return 'header'; }
@@ -738,8 +766,8 @@ const render = function(config) {
       Promise.all([ this.menu, this.content, this.hxList ]).then(([ menu, content, hxList ]) => {
         this.frameBody = new FrameBody({ menu, content, hxList }).to(this);
       }, error => {
-        let { name, message } = error;
-        this.frameBody = new FrameError({ name, message }).to(this);
+        let { name, stack } = error;
+        this.frameBody = new FrameError({ name, message: stack }).to(this);
       });
     }
     get md() {
@@ -834,10 +862,12 @@ const render = function(config) {
     static get $hljs() {
       let value = new Promise((resolve, reject) => {
         let tasks = (config.languages || []).map(name => {
-          return fetch(`//github.elemecdn.com/isagalaev/highlight.js/9.6.0/src/languages/${name}.js`).then(response => {
+          return fetch(`//cdn.jsdelivr.net/npm/highlight.js@9.12.0/lib/languages/${name}.min.js`).then(response => {
             return response.text();
           }).then(code => {
-            hljs.registerLanguage(name, new Function(`return (${code})`)());
+            let module = { exports: {} };
+            new Function('module', code)(module);
+            hljs.registerLanguage(name, module.exports);
           });
         });
         const renderer = new marked.Renderer();
@@ -864,46 +894,6 @@ const render = function(config) {
   let Component = location.pathname === config.home ? Landing : Frame;
   new Component().to(document.body);
   document.title = config.name;
-
-};
-
-const loadScript = url => new Promise(resolve => {
-  let script = document.createElement('script');
-  script.src = url;
-  script.addEventListener('load', resolve);
-  document.head.appendChild(script);
 });
-
-const loadStyle = url => new Promise(resolve => {
-  let link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = url;
-  link.addEventListener('load', resolve);
-  document.head.appendChild(link);
-});
-
-const load = (resources) => {
-  if (!(resources instanceof Array)) resources = [ resources ];
-  let tasks = resources.map(url => {
-    if (url.then) return url;
-    switch (url.match(/\.(\w*)$|$/)[1]) {
-      case 'js': return loadScript(url);
-      case 'css': return loadStyle(url);
-    }
-  });
-  return Promise.all(tasks);
-};
-
-let $loading = load([
-  load('//github.elemecdn.com/uglifyjs!YanagiEiichi/jinkela/1.2.19/umd.js'),
-  '//github.elemecdn.com/chjj/marked/v0.3.6/marked.min.js',
-  '//github.elemecdn.com/uglifyjs!isagalaev/highlight.js/9.6.0/src/highlight.js',
-  '//github.elemecdn.com/cferdinandi/smooth-scroll/v10.0.1/dist/js/smooth-scroll.min.js',
-  '//github.elemecdn.com/isagalaev/highlight.js/9.6.0/src/styles/default.css'
-]);
-
-window.reciper = config => {
-  $loading.then(() => render(config));
-};
 
 /**/ }
