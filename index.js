@@ -1,33 +1,92 @@
 /**/ {
 
-const load = url => new Promise((resolve, reject) => {
-  if (/\.js$/.test(url)) {
-    fetch(url).then(response => Promise.all([ response, response.text() ])).then(([ response, body ]) => {
-      let type = response.headers.get('Content-Type');
-      if (!response.ok || !/\b(javascript)\b/.test(type)) throw body;
-      let module = { exports: {} };
-      new Function('module', 'exports', body)(module, module.exports);
-      return module.exports;
-    }).then(resolve, reject);
-  } else {
-    let link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = url;
-    link.addEventListener('load', resolve.bind(null, link));
-    link.addEventListener('error', reject);
-    document.head.appendChild(link);
+const dependencies = new class {
+  constructor() {
+    this.list = [
+      window.Promise || '//cdn.jsdelivr.net/npm/es6-promise@4.2.4/dist/es6-promise.auto.min.js#script',
+      window.fetch || '//cdn.jsdelivr.net/npm/whatwg-fetch@v2.0.3/fetch.min.js#script',
+      '//cdn.jsdelivr.net/npm/jinkela@1.3.2/umd.min.js',
+      '//cdn.jsdelivr.net/npm/marked@0.3.17/marked.min.js',
+      '//cdn.jsdelivr.net/npm/highlight.js@9.12.0/lib/highlight.min.js',
+      '//cdn.jsdelivr.net/npm/highlight.js@9.12.0/styles/default.min.css#link',
+      '//cdn.jsdelivr.net/npm/smooth-scroll@12.1.5/dist/js/smooth-scroll.min.js'
+    ];
+    this._count = this.list.length;
+    this.status = 0;
+    this._loaded = 0;
+    this._handlers = [];
+    this._result = [];
+    this.list.forEach((what, index) => {
+      this._loadOne(what, this._done.bind(this, index), this._fail.bind(this));
+    });
   }
-});
+  then(done, fail) {
+    this._handlers.push({ 1: done, '-1': fail });
+    if (this.status) this._doHandlers();
+  }
+  get _value() { return { 1: this._result, '-1': this._error }[this.status]; }
+  _done(index, value) {
+    if (this.status || index in this._result) return;
+    this._result[index] = value;
+    this._loaded++;
+    if (this._loaded == this._count) {
+      this.status = 1;
+      this._doHandlers();
+    }
+  }
+  _fail(error) {
+    if (this.status) return;
+    this._error = error;
+    this.status = -1;
+    this._doHandlers();
+  }
+  _doHandlers() {
+    this._handlers.splice(0).map(item => item[this.status]).forEach(f => f && f(this._value));
+  }
+  _loadOne(what, resolve, reject) {
+    if (typeof what !== 'string') return resolve(what);
+    let [ url, loader ] = what.split('#');
+    switch (loader) {
+      case 'script':
+        let script = document.createElement('script');
+        script.src = url;
+        script.addEventListener('load', () => {
+          setTimeout(() => {
+            resolve(script);
+          });
+        });
+        script.addEventListener('error', reject);
+        document.head.appendChild(script);
+        break;
+      case 'link':
+        let link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = url;
+        link.addEventListener('load', resolve.bind(null, link));
+        link.addEventListener('error', reject);
+        document.head.appendChild(link);
+        break;
+      default:
+        let xhr = new XMLHttpRequest();
+        xhr.open('GET', url);
+        xhr.addEventListener('load', () => {
+          let type = xhr.getResponseHeader('Content-Type');
+          if (!xhr.status === 200 || !/\b(javascript)\b/.test(type)) throw xhr.responseText;
+          let module = { exports: {} };
+          try {
+            new Function('module', 'exports', xhr.responseText)(module, module.exports);
+          } catch(error) {
+            reject(error);
+          }
+          resolve(module.exports);
+        });
+        xhr.addEventListener('error', reject);
+        xhr.send();
+    }
+  }
+};
 
-const dependencies = Promise.all([
-  '//cdn.jsdelivr.net/npm/jinkela@1.3.2/umd.min.js',
-  '//cdn.jsdelivr.net/npm/marked@0.3.17/marked.min.js',
-  '//cdn.jsdelivr.net/npm/highlight.js@9.12.0/lib/highlight.min.js',
-  '//cdn.jsdelivr.net/npm/highlight.js@9.12.0/styles/default.min.css',
-  '//cdn.jsdelivr.net/npm/smooth-scroll@12.1.5/dist/js/smooth-scroll.min.js'
-].map(load));
-
-window.reciper = config => dependencies.then(([ Jinkela, marked, hljs, _, SmoothScroll ]) => {
+window.reciper = config => dependencies.then(([ _0, _1, Jinkela, marked, hljs, _2, SmoothScroll ]) => {
   const smoothScroll = new SmoothScroll();
 
   class LandingHeader extends Jinkela {
