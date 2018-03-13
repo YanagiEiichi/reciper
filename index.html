@@ -5,32 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="chrome=1" />
     <meta name="renderer" content="webkit" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, minimum-scale=1.0" />
-    <script src="https://cdn.jsdelivr.net/npm/reciper@0.1.12/index.es5.min.js"></script>
-    <script>
-    void function callee(href, contents) {
-      var root = href.replace(/\/[^/]*$/, '');
-      if (root === href) return document.write(contents);
-      let xhr = new XMLHttpRequest();
-      xhr.open('GET', root + '/reciper.json');
-      xhr.addEventListener('load', function() {
-        if (xhr.status === 200 && /\bjson\b/.test(xhr.getResponseHeader('Content-Type'))) {
-          var config = JSON.parse(xhr.responseText);
-          config.home = root + '/';
-          if (config.logoHref && !/^(\w+:)?\/\/|^\//.test(config.logoHref)) {
-            config.logoHref = root + '/' + config.logoHref;
-          }
-          config.items.forEach(function callee(item) {
-            if (item.href && !/^(\w+:)?\/\/|^\//.test(item.href)) item.href = root + '/' + item.href;
-            if (item.children) item.children.forEach(callee);
-          });
-          reciper(config);
-        } else {
-          callee(root, xhr.responseText);
-        }
-      });
-      xhr.addEventListener('error', function(error) { callee(root, error.stack); });
-      xhr.send();
-    }(location.pathname);
-    </script>
+    <meta name="description" content="呵呵" />
+    <script src="https://cdn.jsdelivr.net/npm/reciper@0.1.13/auto.es5.min.js"></script>
   </head>
 </html>

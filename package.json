@@ -1,6 +1,6 @@
 {
   "name": "reciper",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "description": "A DOCUMENTATION SITE CREATOR",
   "main": "index.js",
   "directories": {
@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "exit 0",
-    "prepublish": "babel index.js -o index.es5.js"
+    "prepublish": "make"
   },
   "bin": {
     "reciper": "./reciper.js"
@@ -17,7 +17,9 @@
   "license": "MIT",
   "devDependencies": {
     "babel-cli": "^6.10.1",
-    "babel-preset-es2015": "^6.9.0"
+    "babel-preset-es2015": "^6.9.0",
+    "eslint": "^4.17.0",
+    "eslint-config-elemefe": "^0.3.0"
   },
   "dependencies": {
     "argollector": "^1.0.0",

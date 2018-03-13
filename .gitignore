@@ -1,3 +1,4 @@
 .*
 node_modules
-index.es5.js
+*.es5.js
+auto.js
