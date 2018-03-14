@@ -2,6 +2,8 @@
 
 Reciperっては仕様書を作る工具、Markdown から仕様書サイートに転換することができる。
 
+<img src="http://localhost/Develop/reciper/book.png" srcset="http://localhost/Develop/reciper/book.png 2x" />
+
 ## 始める
 
 #### 1. プロジェクトのルートデイレクトリを作成する

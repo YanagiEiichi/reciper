@@ -728,16 +728,6 @@
         [].forEach.call(aList, a => {
           if (!/^#/.test(a.getAttribute('href'))) a.target = '_blank';
         });
-        // images
-        let imgList = this.element.querySelectorAll('img');
-        let width = Math.min(this.element.offsetWidth - 28, 600);
-        [].forEach.call(imgList, img => {
-          if (img.width > width) {
-            let scale = width / img.width;
-            img.width *= scale;
-            img.height *= scale;
-          }
-        });
         // hxList
         let list = this.element.querySelectorAll('h1,h2,h3,h4,h5,h6');
         this.hxList = [];

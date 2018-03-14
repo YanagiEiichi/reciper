@@ -2,6 +2,8 @@
 
 Reciper 是一个文档生成工具，它可以将 Markdown 文档构建成站点。
 
+<img src="http://localhost/Develop/reciper/book.png" srcset="http://localhost/Develop/reciper/book.png 2x" />
+
 ## 快速入门
 
 #### 1. 创建一个项目目录并进入
