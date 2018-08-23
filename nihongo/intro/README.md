@@ -2,7 +2,7 @@
 
 Reciperっては仕様書を作る工具、Markdown から仕様書サイートに転換することができる。
 
-<img src="http://localhost/Develop/reciper/book.png" srcset="http://localhost/Develop/reciper/book.png 2x" />
+<img src="../../book.png" srcset="../../book.png 2x" />
 
 ## 始める
 
