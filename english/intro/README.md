@@ -2,7 +2,7 @@
 
 Reciper is a document creator, it build some markdown document to a website.
 
-<img src="http://localhost/Develop/reciper/book.png" srcset="http://localhost/Develop/reciper/book.png 2x" />
+<img src="../../book.png" srcset="../../book.png 2x" />
 
 ## Getting Started
 
