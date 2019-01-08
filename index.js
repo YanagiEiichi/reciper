@@ -756,8 +756,11 @@
           max-width: 600px;
           line-height: 1.6em;
           color: ${config.normalColor};
-          > *:first-child {
+          > div.page:first-child {
             margin-top: 0;
+            > *:first-child {
+              margin-top: 0;
+            }
           }
           > div.page:last-child {
             min-height: ${clientHeight - 16}px;
@@ -767,15 +770,18 @@
             max-width: 100%;
           }
           h1 {
-            margin: 0 0 1em;
+            margin: 1.5em 0 .3em;
+            padding: .5em 0 1.2em;
+            border-bottom: 1px solid #ddd;
           }
           h2 {
-            margin: 2em 0 .8em;
-            padding-bottom: 0.7em;
+            margin: 1.5em 0 .3em;
+            padding: .5em 0 1.2em;
             border-bottom: 1px solid #ddd;
           }
           h3 {
-            margin: 3em 0 1.2em;
+            margin: 2.5em 0 .7em;
+            padding: .5em 0 .5em;
             position: relative;
           }
           table {
