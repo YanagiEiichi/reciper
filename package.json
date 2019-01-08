@@ -1,6 +1,6 @@
 {
   "name": "reciper",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "description": "A DOCUMENTATION SITE CREATOR",
   "main": "index.js",
   "directories": {
