@@ -678,7 +678,7 @@
           let hash;
           switch (true) {
             case scrollTop < getOffset(left):
-              hash = '##';
+              hash = '';
               break;
             case scrollTop > getOffset(right):
               hash = encodeURIComponent(hxList[right].textContent);
