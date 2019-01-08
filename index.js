@@ -760,6 +760,7 @@
           > div.page:first-child {
             margin-top: 0;
             > *:first-child {
+              padding-top: 0;
               margin-top: 0;
             }
           }
