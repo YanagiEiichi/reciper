@@ -195,6 +195,8 @@
             max-height: 100%;
           }
           > span {
+            width: 100%;
+            height: 100%;
             text-align: center;
             background: #f5f5f5;
             border-radius: 100%;
