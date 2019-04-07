@@ -698,8 +698,20 @@
           }
           clearTimeout(this.hashing);
           this.hashing = setTimeout(() => (this.hashing = null), 100);
-          location.replace('#' + hash);
+          this.updateHash(hash);
         }
+      }
+      get updateHash() {
+        let lastHash = null;
+        let value = hash => {
+          if (lastHash === null) setTimeout(() => {
+            location.replace('#' + lastHash);
+            lastHash = null;
+          }, 100);
+          lastHash = hash;
+        };
+        Object.defineProperty(this, 'updateHash', { value, configurable: true });
+        return value;
       }
       init() {
         let { menu, content } = this;
