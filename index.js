@@ -5,7 +5,7 @@
       this.list = [
         window.Promise || '//cdn.jsdelivr.net/npm/es6-promise@4.2.4/dist/es6-promise.auto.min.js#script',
         window.fetch || '//cdn.jsdelivr.net/npm/whatwg-fetch@v2.0.3/fetch.min.js#script',
-        '//cdn.jsdelivr.net/npm/jinkela@1.3.2/umd.min.js',
+        '//cdn.jsdelivr.net/npm/jinkela@1.3.7/umd.min.js',
         '//cdn.jsdelivr.net/npm/marked@0.3.17/marked.min.js',
         '//cdn.jsdelivr.net/npm/highlight.js@9.12.0/lib/highlight.min.js',
         '//cdn.jsdelivr.net/npm/highlight.js@9.12.0/styles/default.min.css#link',
@@ -89,98 +89,25 @@
   window.reciper = config => dependencies.then(([ , , Jinkela, marked, hljs, , SmoothScroll ]) => {
     const smoothScroll = new SmoothScroll();
 
-    class LandingHeader extends Jinkela {
-      get tagName() { return 'header'; }
-      init() {
-        new Nav().to(this);
-      }
-      get styleSheet() {
-        return `
-        :scope {
-          text-align: center;
-          height: 40px;
-          line-height: 40px;
-        }
-      `;
-      }
-    }
-
-    class LandingCaption extends Jinkela {
-      init() {
-        this.element.textContent = config.name;
-      }
-      get styleSheet() {
-        return `
-        :scope {
-          font-size: 48px;
-          margin-top: 1em;
-          font-weight: bold;
-          color: ${config.primaryColor};
-        }
-      `;
-      }
-    }
-
-    class LandingDescription extends Jinkela {
-      init() {
-        this.element.textContent = config.description;
-      }
-      get styleSheet() {
-        return `
-        :scope {
-          opacity: .5;
-          margin-top: 1em;
-          color: ${config.primaryColor};
-        }
-      `;
-      }
-    }
-
-    class Landing extends Jinkela {
-      init() {
-        new LandingHeader().to(this);
-        let logo = new Logo({ size: 240, href: config.logoHref }).to(this);
-        logo.element.style.marginTop = '50px';
-        new LandingCaption().to(this);
-        new LandingDescription().to(this);
-      }
-      get styleSheet() {
-        return `
-        html, body {
-          height: 100%;
-        }
-        body {
-          margin: 0;
-          font-family: 'Helvetica Neue', 'Luxi Sans', 'DejaVu Sans', Tahoma, 'Hiragino Sans GB', STHeiti, 'Microsoft YaHei';
-        }
-        :scope {
-          position: relative;
-          top: 50%;
-          transform: translateY(-50%);
-          text-align: center;
-        }
-      `;
-      }
-    }
+    /**
+     * 导航
+    **/
 
     class Logo extends Jinkela {
       init() {
-        let size = this.size + 'px';
         if (config.logoUrl) {
-          new Jinkela({ template: `<img src="${config.logoUrl}" />` }).to(this);
+          let img = document.createElement('img');
+          img.src = config.logoUrl;
+          this.content = img;
         } else {
           let text = config.name[0].toUpperCase();
           if (text.charCodeAt(0) < 256) text += config.name[1];
-          new Jinkela({ template: `<span>${text}</span>` }).to(this);
-          this.element.style.lineHeight = size;
-          this.element.style.fontSize = this.size / 2 + 'px';
+          this.content = text;
         }
-        this.element.style.width = size;
-        this.element.style.height = size;
-        this.element.addEventListener('click', () => (location.href = this.href || config.home));
+        this.element.href = this.href || config.home;
       }
       get template() {
-        return '<div class="logo"></div>';
+        return '<a class="logo"><meta ref="content" /></a>';
       }
       get styleSheet() {
         return `
@@ -266,16 +193,25 @@
     }
 
     class NavItem extends Jinkela {
+      update() {
+        this.active = this.href === location.pathname;
+      }
+      set active(value) {
+        let a = this.element.firstElementChild;
+        a.classList[value ? 'add' : 'remove']('active');
+      }
+      get active() {
+        let a = this.element.firstElementChild;
+        return a.classList.contains('active');
+      }
       init() {
         let a = this.element.firstElementChild;
         if (this.href) {
-          if (this.href === location.pathname) {
-            a.classList.add('active');
-          }
           if (this.target) a.setAttribute('target', this.target);
         } else {
           this.href = 'javascript:';
         }
+        this.update();
         if (this.children) {
           let panel = new NavItemDroppingPanel({ list: this.children }).to(this);
           new NavItemDroppingTip().to(a);
@@ -321,7 +257,13 @@
     }
 
     class Nav extends Jinkela {
-      get tagName() { return 'nav'; }
+      get template() {
+        return `
+          <nav>
+            <meta ref="list" />
+          </nav>
+        `;
+      }
       static get navMap() {
         let value = {};
         config.items.forEach(item => (value[item.href] = item));
@@ -329,29 +271,83 @@
         return value;
       }
       static get current() {
-        let value = this.navMap[location.pathname];
-        Object.defineProperty(this, 'current', { configurable: true, value });
-        return value;
+        return this.navMap[location.pathname];
       }
       init() {
-        NavItem.from(config.items).to(this);
+        this.list = NavItem.from(config.items);
+      }
+      update() {
+        this.list.forEach(item => {
+          item.update();
+        });
+      }
+      get styleSheet() {
+        return `
+          :scope {
+            height: 40px;
+            line-height: 40px;
+          }
+          .not-home :scope {
+            flex: 1;
+            text-align: right;
+          }
+          .home :scope {
+            order: -1;
+            text-align: center;
+          }
+          @media (max-width: 720px) {
+            .not-home :scope {
+              display: none;
+            }
+          }
+        `;
       }
     }
 
-    class FrameHeaderName extends Jinkela {
+
+    /**
+     * 头部
+    **/
+
+    class HeaderDescription extends Jinkela {
+      init() {
+        this.element.textContent = config.description;
+      }
+      get styleSheet() {
+        return `
+        .home :scope {
+          opacity: .5;
+          margin-top: 1em;
+          color: ${config.primaryColor};
+        }
+        .not-home :scope {
+          display: none;
+        }
+      `;
+      }
+    }
+
+    class HeaderName extends Jinkela {
       get template() { return `<a href="${config.home}">${config.name}</a>`; }
       get styleSheet() {
         return `
         :scope {
           text-decoration: none;
+          color: ${config.primaryColor};
+        }
+        .not-home :scope {
           font-size: 1.5em;
           font-weight: bold;
           margin-left: .5em;
-          color: ${config.primaryColor};
           opacity: .7;
         }
+        .home :scope {
+          font-size: 48px;
+          margin-top: 1em;
+          font-weight: bold;
+        }
         @media (max-width: 720px) {
-          :scope {
+          .not-home :scope {
             display: none;
           }
         }
@@ -359,23 +355,7 @@
       }
     }
 
-    class FrameHeaderNav extends Nav {
-      get styleSheet() {
-        return `
-        :scope {
-          flex: 1;
-          text-align: right;
-        }
-        @media (max-width: 720px) {
-          :scope {
-            display: none;
-          }
-        }
-      `;
-      }
-    }
-
-    class FrameHeaderHamburger extends Jinkela {
+    class HeaderHamburger extends Jinkela {
       get tagName() { return 'div'; }
       init() {
         this.element.addEventListener('click', event => {
@@ -414,7 +394,7 @@
           }
         }
         @media (max-width: 720px) {
-          :scope {
+          .not-home :scope {
             display: block;
           }
         }
@@ -422,42 +402,82 @@
       }
     }
 
-    class FrameHeader extends Jinkela {
+    class Header extends Jinkela {
       get tagName() { return 'header'; }
       init() {
-        new FrameHeaderHamburger().to(this);
-        new Logo({ size: 40 }).to(this);
-        new FrameHeaderName().to(this);
-        new FrameHeaderNav().to(this);
+        new HeaderHamburger().to(this);
+        new Logo().to(this);
+        new HeaderName().to(this);
+        new HeaderDescription().to(this);
+        this.nav = new Nav().to(this);
+      }
+      update() {
+        this.nav.update();
       }
       get styleSheet() {
         return `
-        :scope {
-          line-height: 40px;
-          box-sizing: border-box;
-          background-color: #fff;
-          box-shadow: 0 0 4px rgba(0,0,0,0.25);
-          padding: 25px 60px;
-          position: relative;
-          width: 100%;
-          display: flex;
-          z-index: 2;
-        }
-        @media (max-width: 720px) {
-          :scope {
-            padding: .5em 1em .7em 1em;
-            position: fixed;
-            display: block;
+          .not-home :scope {
+            .logo {
+              width: 40px;
+              height: 40px;
+              line-height: 40px;
+              font-size: 20px;
+            }
+            line-height: 40px;
+            box-sizing: border-box;
+            background-color: #fff;
+            box-shadow: 0 0 4px rgba(0,0,0,0.25);
+            padding: 25px 60px;
+            position: relative;
+            width: 100%;
+            display: flex;
+            z-index: 2;
           }
-        }
-        @media (max-width: 720px) {
-          :scope > div {
+          @media (max-width: 720px) {
+            .not-home :scope {
+              padding: .5em 1em .7em 1em;
+              position: fixed;
+              display: block;
+            }
+          }
+          @media (max-width: 720px) {
+            .not-home :scope > div {
+              text-align: center;
+            }
+          }
+          .home :scope {
+            display: flex;
+            flex-direction: column;
+            .logo {
+              margin-top: 50px;
+              width: 240px;
+              height: 240px;
+              line-height: 240px;
+              font-size: 120px;
+            }
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            transform: translateY(-50%);
             text-align: center;
           }
-        }
-      `;
+          @media (max-width: 720px) {
+            .home :scope {
+
+            }
+          }
+          @media (max-width: 720px) {
+            .home :scope > div {
+            }
+          }
+        `;
       }
     }
+
+    /**
+     * 左侧菜单
+    **/
 
     class FrameMenuNav extends Nav {
       init() { this.element.classList.add('FrameMenuNav'); }
@@ -618,6 +638,10 @@
       }
     }
 
+    /**
+     * 架子
+    **/
+
     class FrameMain extends Jinkela {
       init() {
         let { content } = this;
@@ -654,15 +678,23 @@
         if (this.hashing) return;
         let { hxList } = this.content;
         let text = decodeURIComponent(location.hash.slice(1));
-        hxList.forEach(i => {
-          if (i.textContent === text) {
-            this.animating = true;
-            let after = () => (this.animating = false);
-            let offset = this.fixedOffset;
-            let options = { speed: 200, after, offset };
-            return smoothScroll.animateScroll(i, null, options);
-          }
-        });
+        if (text === '') {
+          this.animateScroll(document.body);
+        } else {
+          hxList.some(i => {
+            if (i.textContent === text) {
+              this.animateScroll(i);
+              return true;
+            }
+          });
+        }
+      }
+      animateScroll(element) {
+        this.animating = true;
+        let after = () => (this.animating = false);
+        let offset = this.fixedOffset;
+        let options = { speed: 200, after, offset };
+        return smoothScroll.animateScroll(element, null, options);
       }
       scroll() {
         this.frameMenu.update();
@@ -697,7 +729,7 @@
               hash = encodeURIComponent(hxList[left].textContent);
           }
           clearTimeout(this.hashing);
-          this.hashing = setTimeout(() => (this.hashing = null), 100);
+          this.hashing = setTimeout(() => (this.hashing = null), 16);
           this.updateHash(hash);
         }
       }
@@ -719,8 +751,6 @@
         this.frameMain = new FrameMain({ content }).to(this);
         this.animating = false;
         this.hashing = null;
-        addEventListener('scroll', () => this.scroll());
-        addEventListener('hashchange', () => this.hashchange());
         setTimeout(() => this.hashchange());
       }
       get styleSheet() {
@@ -740,13 +770,14 @@
 
     class FrameContent extends Jinkela {
       init() {
-        let aList = this.element.querySelectorAll('a');
+        let { dom } = this;
+        let aList = dom.querySelectorAll('a');
         // links
         [].forEach.call(aList, a => {
           if (!/^#/.test(a.getAttribute('href'))) a.target = '_blank';
         });
         // hxList
-        let list = this.element.querySelectorAll('h1,h2,h3,h4,h5,h6');
+        let list = dom.querySelectorAll('h1,h2,h3,h4,h5,h6');
         this.hxList = [];
         for (let i = 0; i < list.length; i++) {
           let item = list[i];
@@ -759,6 +790,7 @@
           page.appendChild(item);
           while (page.nextSibling && !/^H\d$/.test(page.nextSibling.tagName)) page.appendChild(page.nextSibling);
         }
+        while (dom.firstChild) this.element.appendChild(dom.firstChild);
       }
       get styleSheet() {
         let { clientHeight } = document.documentElement;
@@ -864,19 +896,60 @@
     }
 
     class Frame extends Jinkela {
+      get Header() { return Header; }
       click(event) {
         if (event.isHamburgerClick && this.frameBody) {
           this.frameBody.toggleMenu();
         }
       }
+      hashchange(event) {
+        if (this.frameBody) this.frameBody.hashchange(event);
+      }
+      scroll(event) {
+        if (this.frameBody) this.frameBody.scroll(event);
+      }
       init() {
-        this.element.addEventListener('click', event => this.click(event));
-        new FrameHeader().to(this);
+        addEventListener('scroll', () => this.scroll());
+        addEventListener('hashchange', () => this.hashchange());
+        if (config.spa) this.initSpa();
+        this.update();
+      }
+      initSpa() {
+        addEventListener('popstate', event => {
+          frame.update();
+        });
+        addEventListener('click', event => {
+          let { target } = event;
+          if (target.tagName !== 'A') return;
+          if (target.target !== '') return;
+          event.preventDefault();
+          history.pushState(null, '', target.href);
+          this.hashchange();
+          frame.update();
+        });
+      }
+      update() {
+        if (this.lastPathname === location.pathname) return;
+        this.lastPathname = location.pathname;
+        this.frameHeader.update();
+        if (location.pathname === config.home) {
+          this.element.classList.add('home');
+          this.element.classList.remove('not-home');
+          this.frameBody = null;
+        } else {
+          this.element.classList.remove('home');
+          this.element.classList.add('not-home');
+          this.loadContent();
+        }
+      }
+      loadContent() {
+        delete this.md;
+        delete this.content;
         Promise.all([ this.menu, this.content ]).then(([ menu, content ]) => {
-          this.frameBody = new FrameBody({ menu, content }).to(this);
+          this.frameBody = new FrameBody({ menu, content });
         }, error => {
           let { name, stack } = error;
-          this.frameBody = new FrameError({ name, message: stack }).to(this);
+          this.frameBody = new FrameError({ name, message: stack });
         });
       }
       get md() {
@@ -894,7 +967,7 @@
       }
       get content() {
         let value = Frame.$hljs.then(() => this.md).then(md => {
-          return new FrameContent({ template: `<div>${marked(md)}</div>` });
+          return new FrameContent({ dom: Jinkela.html`${marked(md)}`.element });
         }, error => {
           throw error;
         });
@@ -933,15 +1006,24 @@
           return result;
         });
       }
+      get template() {
+        return `
+          <div on-click="{click}">
+            <jkl-header ref="frameHeader"></jkl-header>
+            <meta ref="frameBody" />
+          </div>
+        `;
+      }
       get styleSheet() {
         return `
-        body {
-          font-family: 'Source Sans Pro', 'Helvetica Neue', Arial, sans-serif;
-          font-size: 15px;
-          -webkit-font-smoothing: antialiased;
-          margin: 0;
-        }
-      `;
+          body {
+            font-family: 'Helvetica Neue', 'Luxi Sans', 'DejaVu Sans', Tahoma,
+                         'Hiragino Sans GB', STHeiti, 'Microsoft YaHei';
+            font-size: 15px;
+            -webkit-font-smoothing: antialiased;
+            margin: 0;
+          }
+        `;
       }
       static get $hljs() {
         let value = new Promise((resolve, reject) => {
@@ -975,8 +1057,7 @@
     config.primaryColor = config.primaryColor || '#000';
     config.home = config.home || '/';
 
-    let Component = location.pathname === config.home ? Landing : Frame;
-    new Component().to(document.body);
+    let frame = new Frame().to(document.body);
     document.title = config.name;
   });
 
